@@ -66,4 +66,14 @@ class SupabaseService {
 
     return res;
   }
+
+  // Fetch all leave applications for a student
+  Future<List<Map<String, dynamic>>> getLeaveApplications(String studentId) async {
+    final res = await supabase
+        .from('leave_requests')
+        .select()
+        .eq('student_id', studentId)
+        .order('applied_at', ascending: false);
+    return List<Map<String, dynamic>>.from(res);
+  }
 }

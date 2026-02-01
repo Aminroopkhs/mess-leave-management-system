@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 import 'screens/leave_screen.dart';
 import 'screens/qr_screen.dart';
 import 'screens/bill_screen.dart';
+import 'screens/leave_applications_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +52,9 @@ class MyApp extends StatelessWidget {
 
         '/bills': (context) =>
             BillScreen(studentId: tempStudentId),
+
+        '/leave-applications': (context) =>
+            LeaveApplicationsScreen(studentId: tempStudentId),
       },
     );
   }

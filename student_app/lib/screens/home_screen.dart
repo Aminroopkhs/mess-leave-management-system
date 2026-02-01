@@ -192,6 +192,11 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () => Navigator.pushNamed(context, '/leave'),
           ),
           ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text("Leave Applications"),
+            onTap: () => Navigator.pushNamed(context, '/leave-applications'),
+          ),
+          ListTile(
             leading: const Icon(Icons.receipt),
             title: const Text("Bills"),
             onTap: () => Navigator.pushNamed(context, '/bills'),

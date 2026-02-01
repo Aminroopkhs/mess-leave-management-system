@@ -65,6 +65,19 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AA1EF9ABE1F94A1BB73C13280A4B949F }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8178B16CF5B543EEB408F990165E7AE0 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0C2B98281E9B4A5DA735648C03C67AF2 }}
+          
+      - name: Set startup command
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: mess-leave-management-backend
+          app-settings-json: |
+            [
+              {
+                "name": "STARTUP_COMMAND",
+                "value": "uvicorn main:app --host 0.0.0.0 --port 8000",
+                "slotSetting": false
+              }
+            ]
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -74,3 +87,4 @@ jobs:
           slot-name: 'Production'
 
           
+

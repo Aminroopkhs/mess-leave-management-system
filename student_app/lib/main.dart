@@ -3,11 +3,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Screens
+import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/leave_screen.dart';
 import 'screens/qr_screen.dart';
 import 'screens/bill_screen.dart';
 import 'screens/leave_applications_screen.dart';
+import 'screens/menu_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +26,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
-  static const String tempStudentId = 'S004';
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,24 +36,54 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
+      // Start at login screen
+      initialRoute: '/login',
 
-      home: const HomeScreen(studentId: tempStudentId),
+      routes: {'/login': (context) => const LoginScreen()},
 
-      routes: {
-        '/home': (context) =>
-            const HomeScreen(studentId: tempStudentId),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/home' ||
+            settings.name == '/leave' ||
+            settings.name == '/qr' ||
+            settings.name == '/bills' ||
+            settings.name == '/leave-applications' ||
+            settings.name == '/menu') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          final email = args?['email'] as String?;
 
-        '/leave': (context) =>
-            const LeaveScreen(studentId: tempStudentId),
+          if (email == null) {
+            // Redirect to login if no email provided
+            return MaterialPageRoute(builder: (context) => const LoginScreen());
+          }
 
-        '/qr': (context) =>
-            const QRScreen(studentId: tempStudentId),
-
-        '/bills': (context) =>
-            BillScreen(studentId: tempStudentId),
-
-        '/leave-applications': (context) =>
-            LeaveApplicationsScreen(studentId: tempStudentId),
+          switch (settings.name) {
+            case '/home':
+              return MaterialPageRoute(
+                builder: (context) => HomeScreen(studentId: email),
+              );
+            case '/leave':
+              return MaterialPageRoute(
+                builder: (context) => LeaveScreen(studentId: email),
+              );
+            case '/qr':
+              return MaterialPageRoute(
+                builder: (context) => QRScreen(studentId: email),
+              );
+            case '/bills':
+              return MaterialPageRoute(
+                builder: (context) => BillScreen(studentId: email),
+              );
+            case '/leave-applications':
+              return MaterialPageRoute(
+                builder: (context) => LeaveApplicationsScreen(studentId: email),
+              );
+            case '/menu':
+              return MaterialPageRoute(
+                builder: (context) => MenuScreen(studentId: email),
+              );
+          }
+        }
+        return null;
       },
     );
   }

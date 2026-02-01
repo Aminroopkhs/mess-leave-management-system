@@ -9,6 +9,7 @@ import 'screens/leave_screen.dart';
 import 'screens/qr_screen.dart';
 import 'screens/bill_screen.dart';
 import 'screens/leave_applications_screen.dart';
+import 'screens/menu_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,8 @@ class MyApp extends StatelessWidget {
             settings.name == '/leave' ||
             settings.name == '/qr' ||
             settings.name == '/bills' ||
-            settings.name == '/leave-applications') {
+            settings.name == '/leave-applications' ||
+            settings.name == '/menu') {
           final args = settings.arguments as Map<String, dynamic>?;
           final email = args?['email'] as String?;
 
@@ -74,6 +76,10 @@ class MyApp extends StatelessWidget {
             case '/leave-applications':
               return MaterialPageRoute(
                 builder: (context) => LeaveApplicationsScreen(studentId: email),
+              );
+            case '/menu':
+              return MaterialPageRoute(
+                builder: (context) => MenuScreen(studentId: email),
               );
           }
         }

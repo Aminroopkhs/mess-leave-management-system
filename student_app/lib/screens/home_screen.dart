@@ -359,6 +359,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // 🔹 Menu Items
           ListTile(
+            leading: const Icon(Icons.restaurant_menu),
+            title: const Text("Weekly Menu"),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/menu',
+              arguments: {'email': widget.studentId},
+            ),
+          ),
+          ListTile(
             leading: const Icon(Icons.qr_code),
             title: const Text("My QR Code"),
             onTap: () => Navigator.pushNamed(

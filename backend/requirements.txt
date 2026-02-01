@@ -1,3 +1,5 @@
+# use python 3.11
+
 fastapi
 uvicorn
 python-dotenv
@@ -8,3 +10,4 @@ passlib[bcrypt]
 python-multipart
 sqlalchemy
 asyncpg
+requests

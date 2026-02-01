@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? student;
   Map<String, dynamic>? leaveStatus;
   Map<String, dynamic>? bill;
+  Map<String, dynamic>? monthUsage;
   bool isLoading = true;
   String? errorMessage;
 
@@ -42,12 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final leave = await service.getTodayLeave(widget.studentId);
       final billing = await service.getCurrentMonthBill(widget.studentId);
+      final usage = await service.getCurrentMonthUsage(widget.studentId);
 
       if (mounted) {
         setState(() {
           student = profile;
           leaveStatus = leave;
           bill = billing;
+          monthUsage = usage;
           isLoading = false;
         });
       }
@@ -141,6 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
+            // 🔹 Current Month Usage Card
+            _monthUsageCard(),
+
+            const SizedBox(height: 16),
+
             // 🔹 Bill Summary Card
             _billSummaryCard(),
           ],
@@ -185,6 +193,113 @@ class _HomeScreenState extends State<HomeScreen> {
       icon: Icons.receipt_long,
       title: "This Month's Bill",
       subtitle: "₹${bill!['total_amount']} • ${bill!['status'].toUpperCase()}",
+    );
+  }
+
+  Widget _monthUsageCard() {
+    if (monthUsage == null) {
+      return const SizedBox.shrink();
+    }
+
+    print('DEBUG UI: monthUsage = $monthUsage');
+    print('DEBUG UI: leave_periods = ${monthUsage!['leave_periods']}');
+    print('DEBUG UI: leave_periods type = ${monthUsage!['leave_periods'].runtimeType}');
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.purple.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.restaurant, size: 36, color: Colors.purple),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Current Month Usage",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${monthUsage!['chargeable_days']} days • ₹${monthUsage!['total_amount']}",
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _usageDetail("Total Days", "${monthUsage!['total_days']}"),
+              _usageDetail("Leave Days", "${monthUsage!['leave_days']}"),
+              _usageDetail("Rate/Day", "₹${monthUsage!['rate_per_day']}"),
+            ],
+          ),
+          if (monthUsage!['leave_periods'] != null &&
+              (monthUsage!['leave_periods'] as List).isNotEmpty) ...[
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 8),
+            const Text(
+              "Applied Leaves This Month:",
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Colors.purple,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: (monthUsage!['leave_periods'] as List)
+                  .map(
+                    (period) => Chip(
+                      label: Text(
+                        "${period['start']} - ${period['end']}",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      backgroundColor: Colors.purple.withOpacity(0.2),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _usageDetail(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.purple,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+      ],
     );
   }
 

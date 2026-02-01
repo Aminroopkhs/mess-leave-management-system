@@ -203,8 +203,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     print('DEBUG UI: monthUsage = $monthUsage');
     print('DEBUG UI: leave_periods = ${monthUsage!['leave_periods']}');
-    print('DEBUG UI: leave_periods type = ${monthUsage!['leave_periods'].runtimeType}');
-    
+    print(
+      'DEBUG UI: leave_periods type = ${monthUsage!['leave_periods'].runtimeType}',
+    );
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

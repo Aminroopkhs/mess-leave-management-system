@@ -132,7 +132,11 @@ class SupabaseService {
 
     // Get all leave requests for current month (including future leaves in this month)
     final monthStartStr = monthStart.toIso8601String().split('T')[0];
-    final monthEnd = DateTime(now.year, now.month + 1, 0); // Last day of current month
+    final monthEnd = DateTime(
+      now.year,
+      now.month + 1,
+      0,
+    ); // Last day of current month
     final monthEndStr = monthEnd.toIso8601String().split('T')[0];
 
     final leaveRequests = await supabase
@@ -156,15 +160,19 @@ class SupabaseService {
       final endDate = DateTime.parse(leave['end_date']);
 
       // Add to leave periods display (show actual leave dates)
-      final displayStart = startDate.isBefore(monthStart) ? monthStart : startDate;
+      final displayStart = startDate.isBefore(monthStart)
+          ? monthStart
+          : startDate;
       final displayEnd = endDate.isAfter(monthEnd) ? monthEnd : endDate;
-      
+
       leavePeriods.add({
         'start': '${displayStart.day}/${displayStart.month}',
         'end': '${displayEnd.day}/${displayEnd.month}',
       });
-      
-      print('DEBUG: Added leave period ${displayStart.day}/${displayStart.month} - ${displayEnd.day}/${displayEnd.month}');
+
+      print(
+        'DEBUG: Added leave period ${displayStart.day}/${displayStart.month} - ${displayEnd.day}/${displayEnd.month}',
+      );
 
       // Adjust dates to be within current month bounds for counting days up to today
       final effectiveStart = startDate.isBefore(monthStart)
@@ -193,9 +201,9 @@ class SupabaseService {
       'total_amount': totalAmount,
       'leave_periods': leavePeriods,
     };
-    
+
     print('DEBUG: Returning result with ${leavePeriods.length} periods');
-    
+
     return result;
   }
 }

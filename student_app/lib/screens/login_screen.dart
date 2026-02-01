@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:convert';
 import '../services/google_auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,10 +12,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final GoogleAuthService _authService = GoogleAuthService();
   bool _isLoading = false;
   String? _errorMessage;
-
-  // Backend URL from environment variable
-  static final String backendUrl =
-      dotenv.env['BACKEND_URL'] ?? 'http://10.0.2.2:8000/api';
 
   @override
   void initState() {
@@ -35,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _isLoading = true;
         });
-        await _verifyWithBackend();
+        await _completeFrontendSignIn();
       }
     } catch (error) {
       print('Silent sign-in error: $error');
@@ -61,8 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Verify with backend
-      await _verifyWithBackend();
+      await _completeFrontendSignIn();
     } catch (error) {
       setState(() {
         _errorMessage = 'Sign-in failed: $error';
@@ -71,57 +62,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Verify the Google Sign-In with backend
-  Future<void> _verifyWithBackend() async {
+  /// Complete sign-in on frontend only (no backend verification)
+  Future<void> _completeFrontendSignIn() async {
     try {
-      final idToken = await _authService.getIdToken();
-
-      if (idToken == null) {
+      final account = _authService.currentUser;
+      if (account == null) {
         setState(() {
-          _errorMessage = 'Failed to get authentication token';
+          _errorMessage = 'No signed-in account found';
           _isLoading = false;
         });
         return;
       }
 
-      print('Attempting to connect to: $backendUrl/auth/google');
-
-      // Send token to backend for verification with timeout
-      final response = await http
-          .post(
-            Uri.parse('$backendUrl/auth/google'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'id_token': idToken}),
-          )
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () {
-              throw Exception('Connection timeout - is the backend running?');
-            },
-          );
-
-      print('Backend response: ${response.statusCode}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-          // Navigate to home screen or store user data
-          Navigator.of(context).pushReplacementNamed('/home', arguments: data);
-        }
-      } else {
+      if (mounted) {
         setState(() {
-          _errorMessage =
-              'Backend verification failed (${response.statusCode}): ${response.body}';
           _isLoading = false;
         });
-        await _authService.signOut();
+        // Navigate to home screen or store user data
+        Navigator.of(context).pushReplacementNamed(
+          '/home',
+          arguments: {
+            'user': {
+              'email': account.email,
+              'name': account.displayName ?? '',
+              'picture': account.photoUrl ?? '',
+              'user_id': account.id,
+              'email_verified': true,
+            },
+          },
+        );
       }
     } catch (error) {
-      print('Verification error: $error');
+      print('Frontend sign-in error: $error');
       setState(() {
         _errorMessage = 'Network error: $error';
         _isLoading = false;

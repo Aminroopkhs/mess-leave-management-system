@@ -351,50 +351,52 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
                             size: 28,
                           ),
                           const SizedBox(width: 16),
-                          RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                fontSize: 17,
-                                color: Colors.black87,
+                          Flexible(
+                            child: RichText(
+                              text: TextSpan(
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  color: Colors.black87,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: "$totalLeaveDays days",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF6366F1),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: " × ",
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                  TextSpan(
+                                    text: "₹$ratePerDay",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: " = ",
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                  TextSpan(
+                                    text: "₹${totalLeaveDays * ratePerDay}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF10B981),
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                  const TextSpan(
+                                    text: " saved",
+                                    style: TextStyle(
+                                      color: Color(0xFF10B981),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              children: [
-                                TextSpan(
-                                  text: "$totalLeaveDays days",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF6366F1),
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: " × ",
-                                  style: TextStyle(color: Colors.grey[600]),
-                                ),
-                                TextSpan(
-                                  text: "₹$ratePerDay",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: " = ",
-                                  style: TextStyle(color: Colors.grey[600]),
-                                ),
-                                TextSpan(
-                                  text: "₹${totalLeaveDays * ratePerDay}",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF10B981),
-                                    fontSize: 22,
-                                  ),
-                                ),
-                                const TextSpan(
-                                  text: " saved",
-                                  style: TextStyle(
-                                    color: Color(0xFF10B981),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ],

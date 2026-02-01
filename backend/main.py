@@ -46,3 +46,5 @@ app.include_router(api_router)
 @app.get("/")
 def root():
     return {"message": "Mess Leave Management System API is running"}
+"""alias for deploy"""
+application=app

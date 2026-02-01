@@ -7,15 +7,16 @@ class LeaveApplicationsScreen extends StatefulWidget {
   const LeaveApplicationsScreen({super.key, required this.studentId});
 
   @override
-  State<LeaveApplicationsScreen> createState() => _LeaveApplicationsScreenState();
+  State<LeaveApplicationsScreen> createState() =>
+      _LeaveApplicationsScreenState();
 }
 
 class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
   final SupabaseService service = SupabaseService();
-  
+
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
-  
+
   List<Map<String, dynamic>> leaveApplications = [];
   Set<DateTime> leaveDays = {};
   bool isLoading = true;
@@ -31,24 +32,26 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
   Future<void> _loadLeaveApplications() async {
     try {
       final applications = await service.getLeaveApplications(widget.studentId);
-      
+
       Set<DateTime> allLeaveDays = {};
       int totalDays = 0;
-      
+
       for (var leave in applications) {
         final startDate = DateTime.parse(leave['start_date']);
         final endDate = DateTime.parse(leave['end_date']);
-        
+
         // Add all days in the leave period to the set
-        for (var d = startDate;
-            d.isBefore(endDate) || d.isAtSameMomentAs(endDate);
-            d = d.add(const Duration(days: 1))) {
+        for (
+          var d = startDate;
+          d.isBefore(endDate) || d.isAtSameMomentAs(endDate);
+          d = d.add(const Duration(days: 1))
+        ) {
           allLeaveDays.add(DateTime(d.year, d.month, d.day));
         }
-        
+
         totalDays += endDate.difference(startDate).inDays + 1;
       }
-      
+
       if (mounted) {
         setState(() {
           leaveApplications = applications;
@@ -75,11 +78,17 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
     for (var leave in leaveApplications) {
       final startDate = DateTime.parse(leave['start_date']);
       final endDate = DateTime.parse(leave['end_date']);
-      final normalizedStart = DateTime(startDate.year, startDate.month, startDate.day);
+      final normalizedStart = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day,
+      );
       final normalizedEnd = DateTime(endDate.year, endDate.month, endDate.day);
-      
-      if ((normalizedDay.isAfter(normalizedStart) || normalizedDay.isAtSameMomentAs(normalizedStart)) &&
-          (normalizedDay.isBefore(normalizedEnd) || normalizedDay.isAtSameMomentAs(normalizedEnd))) {
+
+      if ((normalizedDay.isAfter(normalizedStart) ||
+              normalizedDay.isAtSameMomentAs(normalizedStart)) &&
+          (normalizedDay.isBefore(normalizedEnd) ||
+              normalizedDay.isAtSameMomentAs(normalizedEnd))) {
         return leave;
       }
     }
@@ -93,9 +102,7 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -287,9 +294,15 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _legendItem(const Color(0xFFFB923C).withOpacity(0.85), "Leave Days"),
+                  _legendItem(
+                    const Color(0xFFFB923C).withOpacity(0.85),
+                    "Leave Days",
+                  ),
                   const SizedBox(width: 32),
-                  _legendItem(const Color(0xFF6366F1).withOpacity(0.15), "Today"),
+                  _legendItem(
+                    const Color(0xFF6366F1).withOpacity(0.15),
+                    "Today",
+                  ),
                 ],
               ),
 
@@ -321,7 +334,10 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
                     ),
                     const SizedBox(height: 20),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF10B981).withOpacity(0.08),
                         borderRadius: BorderRadius.circular(16),
@@ -387,10 +403,7 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
                     const SizedBox(height: 16),
                     Text(
                       "You've applied for $totalLeaveDays days of leave",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -408,10 +421,7 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
         Container(
           width: 14,
           height: 14,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
         Text(
@@ -430,7 +440,7 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
     final startDate = DateTime.parse(leave['start_date']);
     final endDate = DateTime.parse(leave['end_date']);
     final days = endDate.difference(startDate).inDays + 1;
-    
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -456,16 +466,25 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
               const SizedBox(height: 20),
               const Text(
                 "Leave Details",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               _detailRow(Icons.calendar_today, "From", _formatDate(startDate)),
-              _detailRow(Icons.calendar_today_outlined, "To", _formatDate(endDate)),
-              _detailRow(Icons.timelapse, "Duration", "$days ${days == 1 ? 'day' : 'days'}"),
-              _detailRow(Icons.savings_outlined, "Amount Saved", "₹${days * ratePerDay}"),
+              _detailRow(
+                Icons.calendar_today_outlined,
+                "To",
+                _formatDate(endDate),
+              ),
+              _detailRow(
+                Icons.timelapse,
+                "Duration",
+                "$days ${days == 1 ? 'day' : 'days'}",
+              ),
+              _detailRow(
+                Icons.savings_outlined,
+                "Amount Saved",
+                "₹${days * ratePerDay}",
+              ),
               if (leave['applied_at'] != null)
                 _detailRow(
                   Icons.access_time,
@@ -489,17 +508,11 @@ class _LeaveApplicationsScreenState extends State<LeaveApplicationsScreen> {
           const SizedBox(width: 12),
           Text(
             "$label: ",
-            style: TextStyle(
-              fontSize: 15,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 15, color: Colors.grey[600]),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
           ),
         ],
       ),

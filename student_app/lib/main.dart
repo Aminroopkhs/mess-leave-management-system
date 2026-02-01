@@ -44,7 +44,8 @@ class MyApp extends StatelessWidget {
         if (settings.name == '/home' ||
             settings.name == '/leave' ||
             settings.name == '/qr' ||
-            settings.name == '/bills') {
+            settings.name == '/bills' ||
+            settings.name == '/leave-applications') {
           final args = settings.arguments as Map<String, dynamic>?;
           final email = args?['email'] as String?;
 
@@ -69,6 +70,10 @@ class MyApp extends StatelessWidget {
             case '/bills':
               return MaterialPageRoute(
                 builder: (context) => BillScreen(studentId: email),
+              );
+            case '/leave-applications':
+              return MaterialPageRoute(
+                builder: (context) => LeaveApplicationsScreen(studentId: email),
               );
           }
         }

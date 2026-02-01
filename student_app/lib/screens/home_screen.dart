@@ -30,28 +30,34 @@ class _HomeScreenState extends State<HomeScreen> {
       final profile = await service.getStudentProfile(widget.studentId);
 
       if (profile == null) {
-        setState(() {
-          errorMessage =
-              'Student profile not found. Please contact administration.';
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            errorMessage =
+                'Student profile not found. Please contact administration.';
+            isLoading = false;
+          });
+        }
         return;
       }
 
       final leave = await service.getTodayLeave(widget.studentId);
       final billing = await service.getCurrentMonthBill(widget.studentId);
 
-      setState(() {
-        student = profile;
-        leaveStatus = leave;
-        bill = billing;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          student = profile;
+          leaveStatus = leave;
+          bill = billing;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        errorMessage = 'Error loading data: $e';
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Error loading data: $e';
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -256,7 +262,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ListTile(
             leading: const Icon(Icons.history),
             title: const Text("Leave Applications"),
-            onTap: () => Navigator.pushNamed(context, '/leave-applications'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/leave-applications',
+              arguments: {'email': widget.studentId},
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.receipt),

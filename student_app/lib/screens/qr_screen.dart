@@ -34,9 +34,7 @@ class _QRScreenState extends State<QRScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -101,7 +99,10 @@ class _QRScreenState extends State<QRScreen> {
                   const SizedBox(height: 4),
                   // Student ID Badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
@@ -152,10 +153,7 @@ class _QRScreenState extends State<QRScreen> {
                     const SizedBox(height: 8),
                     const Text(
                       "Show this at the counter",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 20),
                     Container(
@@ -256,7 +254,12 @@ class _QRScreenState extends State<QRScreen> {
     );
   }
 
-  Widget _profileDetailRow(IconData icon, String label, String value, {bool isLast = false}) {
+  Widget _profileDetailRow(
+    IconData icon,
+    String label,
+    String value, {
+    bool isLast = false,
+  }) {
     return Column(
       children: [
         Padding(
@@ -269,11 +272,7 @@ class _QRScreenState extends State<QRScreen> {
                   color: Colors.deepPurple.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.deepPurple,
-                  size: 22,
-                ),
+                child: Icon(icon, color: Colors.deepPurple, size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -282,10 +281,7 @@ class _QRScreenState extends State<QRScreen> {
                   children: [
                     Text(
                       label,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -301,11 +297,7 @@ class _QRScreenState extends State<QRScreen> {
             ],
           ),
         ),
-        if (!isLast)
-          Divider(
-            color: Colors.grey[200],
-            height: 1,
-          ),
+        if (!isLast) Divider(color: Colors.grey[200], height: 1),
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Screens
+import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/leave_screen.dart';
 import 'screens/qr_screen.dart';
@@ -23,9 +24,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // 🔴 TEMP HARDCODED STUDENT ID
-  static const String tempStudentId = 'S020';
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,21 +34,44 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      // 🔥 START DIRECTLY AT HOME
-      home: const HomeScreen(studentId: tempStudentId),
+      // Start at login screen
+      initialRoute: '/login',
 
-      routes: {
-        '/home': (context) =>
-            const HomeScreen(studentId: tempStudentId),
+      routes: {'/login': (context) => const LoginScreen()},
 
-        '/leave': (context) =>
-            const LeaveScreen(studentId: tempStudentId),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/home' ||
+            settings.name == '/leave' ||
+            settings.name == '/qr' ||
+            settings.name == '/bills') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          final email = args?['email'] as String?;
 
-        '/qr': (context) =>
-            const QRScreen(studentId: tempStudentId),
+          if (email == null) {
+            // Redirect to login if no email provided
+            return MaterialPageRoute(builder: (context) => const LoginScreen());
+          }
 
-        '/bills': (context) =>
-            BillScreen(studentId: tempStudentId),
+          switch (settings.name) {
+            case '/home':
+              return MaterialPageRoute(
+                builder: (context) => HomeScreen(studentId: email),
+              );
+            case '/leave':
+              return MaterialPageRoute(
+                builder: (context) => LeaveScreen(studentId: email),
+              );
+            case '/qr':
+              return MaterialPageRoute(
+                builder: (context) => QRScreen(studentId: email),
+              );
+            case '/bills':
+              return MaterialPageRoute(
+                builder: (context) => BillScreen(studentId: email),
+              );
+          }
+        }
+        return null;
       },
     );
   }

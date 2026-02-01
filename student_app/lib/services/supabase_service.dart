@@ -3,13 +3,55 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final supabase = Supabase.instance.client;
 
+  // Extract student ID from email (last 7 characters before @)
+  static String getStudentIdFromEmail(String email) {
+    final beforeAt = email.split('@')[0];
+    if (beforeAt.length <= 7) {
+      return beforeAt;
+    }
+    return beforeAt.substring(beforeAt.length - 7);
+  }
+
   // Fetch logged-in student profile
-  Future<Map<String, dynamic>> getStudentProfile(String studentId) async {
+  Future<Map<String, dynamic>?> getStudentProfile(String studentId) async {
     final res = await supabase
         .from('students')
         .select()
         .eq('student_id', studentId)
+        .maybeSingle();
+    return res;
+  }
+
+  // Get student profile by email
+  Future<Map<String, dynamic>?> getStudentProfileByEmail(String email) async {
+    final studentId = getStudentIdFromEmail(email);
+    return getStudentProfile(studentId);
+  }
+
+  // Create a new student profile
+  Future<Map<String, dynamic>> createStudentProfile({
+    required String email,
+    required String name,
+    String? phone,
+    String hostel = 'Not Assigned',
+    int year = 1,
+    String department = 'Not Assigned',
+  }) async {
+    final studentId = getStudentIdFromEmail(email);
+    final res = await supabase
+        .from('students')
+        .insert({
+          'student_id': studentId,
+          'name': name,
+          'phone': phone ?? 'Not Provided',
+          'email': email,
+          'hostel': hostel,
+          'year': year,
+          'department': department,
+        })
+        .select()
         .single();
+
     return res;
   }
 

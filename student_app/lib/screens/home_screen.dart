@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/supabase_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/google_auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final String studentId;
@@ -16,6 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? student;
   Map<String, dynamic>? leaveStatus;
   Map<String, dynamic>? bill;
+  bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -24,21 +26,73 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadDashboardData() async {
-    final profile = await service.getStudentProfile(widget.studentId);
-    final leave = await service.getTodayLeave(widget.studentId);
-    final billing = await service.getCurrentMonthBill(widget.studentId);
+    try {
+      final profile = await service.getStudentProfile(widget.studentId);
 
-    setState(() {
-      student = profile;
-      leaveStatus = leave;
-      bill = billing;
-    });
+      if (profile == null) {
+        setState(() {
+          errorMessage =
+              'Student profile not found. Please contact administration.';
+          isLoading = false;
+        });
+        return;
+      }
+
+      final leave = await service.getTodayLeave(widget.studentId);
+      final billing = await service.getCurrentMonthBill(widget.studentId);
+
+      setState(() {
+        student = profile;
+        leaveStatus = leave;
+        bill = billing;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error loading data: $e';
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (student == null) {
+    if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (errorMessage != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Student Dashboard")),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(
+                  errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () async {
+                    final authService = GoogleAuthService();
+                    await authService.signOut();
+                    if (context.mounted) {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    }
+                  },
+                  child: const Text('Back to Login'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -174,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // 🔹 Profile Header
           UserAccountsDrawerHeader(
             accountName: Text(student!['name']),
-            accountEmail: Text("ID: ${student!['student_id']}"),
+            accountEmail: Text(student!['email'] ?? widget.studentId),
             currentAccountPicture: const CircleAvatar(
               child: Icon(Icons.person),
             ),
@@ -184,17 +238,29 @@ class _HomeScreenState extends State<HomeScreen> {
           ListTile(
             leading: const Icon(Icons.qr_code),
             title: const Text("My QR Code"),
-            onTap: () => Navigator.pushNamed(context, '/qr'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/qr',
+              arguments: {'email': widget.studentId},
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.calendar_today),
             title: const Text("Apply Leave"),
-            onTap: () => Navigator.pushNamed(context, '/leave'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/leave',
+              arguments: {'email': widget.studentId},
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.receipt),
             title: const Text("Bills"),
-            onTap: () => Navigator.pushNamed(context, '/bills'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/bills',
+              arguments: {'email': widget.studentId},
+            ),
           ),
 
           // 🔹 Push logout to bottom
@@ -207,10 +273,16 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text("Logout", style: TextStyle(color: Colors.red)),
             onTap: () async {
-              await Supabase.instance.client.auth.signOut();
+              final authService = GoogleAuthService();
+              await authService.signOut();
 
-              // For now, just go back to home/dashboard entry
-              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              }
             },
           ),
 

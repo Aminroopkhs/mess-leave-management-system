@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/google_auth_service.dart';
+import '../services/supabase_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,6 +11,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GoogleAuthService _authService = GoogleAuthService();
+  final SupabaseService _supabaseService = SupabaseService();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -73,15 +75,37 @@ class _LoginScreenState extends State<LoginScreen> {
         });
         return;
       }
+      // Check if student exists, create if not
+      final studentId = SupabaseService.getStudentIdFromEmail(account.email);
+      var student = await _supabaseService.getStudentProfile(studentId);
+
+      if (student == null) {
+        // Create new student profile
+        try {
+          student = await _supabaseService.createStudentProfile(
+            email: account.email,
+            name: account.displayName ?? account.email.split('@')[0],
+            phone: 'Not Provided',
+          );
+        } catch (e) {
+          setState(() {
+            _errorMessage = 'Failed to create student profile: $e';
+            _isLoading = false;
+          });
+          await _authService.signOut();
+          return;
+        }
+      }
 
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        // Navigate to home screen or store user data
+        // Navigate to home screen, using student_id extracted from email
         Navigator.of(context).pushReplacementNamed(
           '/home',
           arguments: {
+            'email': studentId,
             'user': {
               'email': account.email,
               'name': account.displayName ?? '',

@@ -24,8 +24,8 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // 🔴 TEMP HARDCODED STUDENT ID
-  static const String tempStudentId = 'S020';
+
+  static const String tempStudentId = 'S004';
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      // 🔥 START DIRECTLY AT HOME
+
       home: const HomeScreen(studentId: tempStudentId),
 
       routes: {
